@@ -15,14 +15,16 @@ module traffic_light_controller (
     } state_t;
 
     state_t current_state, next_state;
-   
+
     // COUNTER VARIABLE
     logic [3:0] counter;
-    logic       counter_clear;
-    localparam logic [3:0] IDLE_COUNT_MAX  = 4'b1001;
-    localparam logic [3:0] RED_COUNT_MAX = 4'b0100;
-    localparam logic [3:0] GREEN_COUNT_MAX = 4'b0100;
-    localparam logic [3:0] YELLOW_COUNT_MAX = 4'b0010;
+    logic       counter_load;
+    logic [3:0] counter_load_value;
+
+    localparam logic [3:0] IDLE_COUNT_MAX   = 4'b1001; 
+    localparam logic [3:0] RED_COUNT_MAX    = 4'b0100; 
+    localparam logic [3:0] GREEN_COUNT_MAX  = 4'b0100; 
+    localparam logic [3:0] YELLOW_COUNT_MAX = 4'b0010; 
 
     // STATE REGISTER
     always_ff @(posedge clk or negedge rstn) begin
@@ -36,54 +38,50 @@ module traffic_light_controller (
 
     // NEXT STATE LOGIC
     always_comb begin
-        next_state    = current_state; 
-        counter_clear = 1'b0;
+        next_state         = current_state;
+        counter_load       = 1'b0;
+        counter_load_value = IDLE_COUNT_MAX;
 
         case (current_state)
+
             IDLE: begin
-                if (counter == IDLE_COUNT_MAX) begin
-                    next_state    = RED;
-                    counter_clear = 1'b1;
-                end
-                else begin
-                    next_state = IDLE;
+                if (counter == 4'b0) begin
+                    next_state         = RED;
+                    counter_load       = 1'b1;
+                    counter_load_value = RED_COUNT_MAX;
                 end
             end
 
             RED: begin
-                if (counter == RED_COUNT_MAX) begin
-                    next_state    = GREEN;
-                    counter_clear = 1'b1;
-                end
-                else begin
-                    next_state = RED;
+                if (counter == 4'b0) begin
+                    next_state         = GREEN;
+                    counter_load       = 1'b1;
+                    counter_load_value = GREEN_COUNT_MAX;
                 end
             end
 
             GREEN: begin
-                if (counter == GREEN_COUNT_MAX) begin
-                    next_state    = YELLOW;
-                    counter_clear = 1'b1;
-                end
-                else begin
-                    next_state = GREEN;                    
+                if (counter == 4'b0) begin
+                    next_state         = YELLOW;
+                    counter_load       = 1'b1;
+                    counter_load_value = YELLOW_COUNT_MAX;
                 end
             end
 
             YELLOW: begin
-                if (counter == YELLOW_COUNT_MAX) begin
-                    next_state    = RED;
-                    counter_clear = 1'b1;
-                end
-                else begin
-                    next_state = YELLOW;
+                if (counter == 4'b0) begin
+                    next_state         = RED;
+                    counter_load       = 1'b1;
+                    counter_load_value = RED_COUNT_MAX;
                 end
             end
 
             default: begin
-                next_state = IDLE;
-                counter_clear = 1'b1;
+                next_state         = IDLE;
+                counter_load       = 1'b1;
+                counter_load_value = IDLE_COUNT_MAX;
             end
+
         endcase
     end
 
@@ -94,35 +92,40 @@ module traffic_light_controller (
         yellow_light = 1'b0;
 
         case (current_state)
+
             IDLE: begin
                 red_light = 1'b1;
             end
+
             RED: begin
-                red_light    = 1'b1;
+                red_light = 1'b1;
             end
-            
+
             GREEN: begin
                 green_light = 1'b1;
             end
+
             YELLOW: begin
                 yellow_light = 1'b1;
             end
+
             default: begin
                 red_light = 1'b1;
             end
+
         endcase
     end
 
-    // DATAPATH - COUNTER
+    // DATAPATH - DOWN COUNTER
     always_ff @(posedge clk or negedge rstn) begin
         if (!rstn) begin
-            counter <= 4'b0;
-        end 
-        else if (counter_clear) begin
-            counter <= 4'b0; 
-        end 
+            counter <= IDLE_COUNT_MAX;
+        end
+        else if (counter_load) begin
+            counter <= counter_load_value;
+        end
         else begin
-            counter <= counter + 1'b1;
+            counter <= counter - 1'b1;
         end
     end
 
