@@ -1,4 +1,15 @@
-# Traffic Light Controller FSM
+<div align="center">
+  <h1>🚦 Traffic Light Controller FSM</h1>
+  <p><strong>A Moore-style controller with programmable red, green and yellow timing</strong></p>
+  <p>
+    <img src="https://img.shields.io/badge/HDL-SystemVerilog-F97316?style=for-the-badge" alt="SystemVerilog" />
+    <img src="https://img.shields.io/badge/Control-Moore%20FSM-8B5CF6?style=for-the-badge" alt="Moore FSM" />
+    <img src="https://img.shields.io/badge/RTL-Synthesizable-22C55E?style=for-the-badge" alt="Synthesizable RTL" />
+    <img src="https://img.shields.io/badge/Verification-Waveform%20Only-EAB308?style=for-the-badge" alt="Waveform-only verification" />
+  </p>
+</div>
+
+---
 
 A SystemVerilog Moore-style finite-state machine that sequences red, green and yellow outputs using a shared down-counter.
 
@@ -83,4 +94,3 @@ gtkwave dump.vcd
 | Long run | Multiple complete loops without counter underflow |
 
 For hardware use, replace the small demonstration counts with parameterized cycle counts derived from the system clock frequency.
-
